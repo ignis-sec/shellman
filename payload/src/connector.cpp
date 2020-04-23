@@ -6,7 +6,7 @@
 Connector::Connector(char *ip, int port){
     this->_conIP = ip;
     this->_conPort = port;
-    strcpy(this->_conIP, "127.0.0.1");
+    strcpy(this->_stagerIP, "127.0.0.1");
     this->_stagerPort = 4445;
 
 }

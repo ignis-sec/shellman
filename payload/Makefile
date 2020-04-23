@@ -7,7 +7,7 @@ BIN		:= bin
 SRC		:= src
 INCLUDE	:= include
 LIB		:= lib
-RES		:= $(wildcard resources/*)
+
 LIBRARIES	:=
 
 
@@ -18,8 +18,6 @@ EXECUTABLE	:= shell
 endif
 
 
-%.rc: $(RES)
-    $(file > $@.rc, $^)
 
 all: $(BIN)/$(EXECUTABLE)
 
