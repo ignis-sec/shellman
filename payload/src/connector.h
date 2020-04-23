@@ -30,7 +30,7 @@ public:
 
     void displayError(int no);
 
-    char *_stagerIP;
+    char _stagerIP[25];
     int _stagerPort;
     char buffer[1024];
 private:
