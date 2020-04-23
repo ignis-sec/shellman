@@ -20,17 +20,20 @@ class Connector{
 public:
     Connector(char *ip, int port);
     ~Connector();
-    
-    int connect();
+
+    int Connect();
+    int get();
+    int write(char* str, int len);
+
+
     void displayError(int no);
 
     char *_stagerIP;
     int _stagerPort;
+    char buffer[1024];
 private:
     char *_conIP;
     int _conPort;
 
     int sock;
-
-    char buffer[1024];
 };
