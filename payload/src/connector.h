@@ -6,7 +6,6 @@
     #define OS_Windows
 #endif
 
-#define OS_Unix
 
 #ifdef OS_Unix
     #include <sys/socket.h> 
@@ -14,6 +13,9 @@
     #include <unistd.h> 
 #endif
 
+#ifdef OS_Windows
+
+#endif
 
 
 class Connector{

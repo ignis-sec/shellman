@@ -51,6 +51,35 @@ Connector::~Connector(){
 
 #endif
 
+#ifdef OS_Windows
+
+int Connector::Connect(){
+    return 0;
+}
+
+int Connector::write(char* str, int len){
+    return 0;
+}
+
+int Connector::get(){
+    return 0;
+}
+
+Connector::~Connector(){
+}
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
 
 
 void Connector::displayError(int no){

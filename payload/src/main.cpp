@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include "connector.h"
-
+#include <string>
 
 int main(int argc, char** argv){
 
