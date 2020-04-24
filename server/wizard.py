@@ -12,13 +12,14 @@ def shellman_wizard():
         'allow_frontend_to_listen': True
     }
 
+    Config()['tls'] = {}
+    Config()['tls']['CN'] = 'localhost'
+
     print('Generating TLS certificate...')
     cert, key = cert_gen()
     print('Done!')
-    Config()['tls'] = {
-        'cert': cert,
-        'key': key
-    }
+    Config()['tls']['cert'] = cert
+    Config()['tls']['key'] = key
 
     Config().write()
 
@@ -34,7 +35,7 @@ def cert_gen():
     cert.get_subject().L = 'Shellman'
     cert.get_subject().O = 'Shellman'
     cert.get_subject().OU = 'Shellman'
-    cert.get_subject().CN = 'Shellman'
+    cert.get_subject().CN = Config()['tls']['CN']
     cert.get_subject().emailAddress = 'sh@ellm.an'
     cert.set_serial_number(0)
     cert.gmtime_adj_notBefore(0)
