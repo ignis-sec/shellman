@@ -1,6 +1,6 @@
 import configparser
 
-from singleton import singleton
+from .singleton import singleton
 
 
 @singleton
