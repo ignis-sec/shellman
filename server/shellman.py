@@ -10,7 +10,9 @@ from wizard import shellman_wizard
 
 @singleton
 class ShellmanCore:
-    connections = []
+    connections = {}
+    connection_id_ctr = 0
+    frontends = []
     ssl_ctx = None
 
     def __init__(self):
@@ -27,7 +29,8 @@ class ShellmanCore:
         os.remove('./cert.pem')
         os.remove('./private.key')
 
-        # import modules
+        # import frontends
+        self.frontends = []
 
         loop = asyncio.get_event_loop()
         asyncio.set_event_loop(loop)
@@ -39,14 +42,20 @@ class ShellmanCore:
 
     async def start_listening(self, port):
         server = await asyncio.start_server(self.client_connected, Config()['connection']['host'],
-                                   port, family=socket.AF_INET, ssl=self.ssl_ctx)
+                                            port, family=socket.AF_INET, ssl=self.ssl_ctx)
         addr = server.sockets[0].getsockname()
         print(f'Serving on {addr}')
 
     async def client_connected(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
-        peername = writer.get_extra_info('peername')
-        print('Connection from %s:%s' % peername)
-        self.connections.append((reader, writer))
+        peername: (str, int) = writer.get_extra_info('peername')
+        connection_id = self.connection_id_ctr
+        self.connection_id_ctr += 1
+
+        print('Connection %s from %s:%s' % (connection_id, *peername))
+        self.connections[connection_id] = (reader, writer, [])
+
+        for frontend in self.frontends:
+            frontend.new_connection(id=connection_id)
         # notify frontends that a new connection is available
 
 

@@ -1,5 +1,5 @@
 from config import Config
-from OpenSSL import crypto, SSL
+from OpenSSL import crypto
 
 
 def shellman_wizard():
@@ -10,10 +10,16 @@ def shellman_wizard():
     Config()['shellman'] = {
         'allow_frontend_to_listen': True
     }
-    Config().write()
+
     print("Generating TLS certificate...")
-    cert_gen()
+    cert, key = cert_gen()
     print("Done!")
+    Config()['tls'] = {
+        'cert': cert,
+        'key': key
+    }
+
+    Config().write()
 
 
 def cert_gen():
@@ -31,17 +37,11 @@ def cert_gen():
     cert.get_subject().emailAddress = "sh@ellm.an"
     cert.set_serial_number(0)
     cert.gmtime_adj_notBefore(0)
-    cert.gmtime_adj_notAfter(10*365*24*60*60)
+    cert.gmtime_adj_notAfter(10 * 365 * 24 * 60 * 60)
     cert.set_issuer(cert.get_subject())
     cert.set_pubkey(k)
-    cert.sign(k, 'sha512')
+    cert.sign(k, b'sha512')
     cert = crypto.dump_certificate(crypto.FILETYPE_PEM, cert).decode("utf-8")
     key = crypto.dump_privatekey(crypto.FILETYPE_PEM, k).decode("utf-8")
 
-    Config()['tls'] = {
-        'cert': cert,
-        'key': key
-    }
-
-    Config().write()
-
+    return cert, key
