@@ -6,13 +6,14 @@ import os
 
 from .singleton import singleton
 from .config import Config
+from .connection import Connection
 
 
 @singleton
 class ShellmanCore:
-    connections = {}
     connection_id_ctr = 0
     frontends = []
+    connections = []
     ssl_ctx = None
     loop = None
 
@@ -50,45 +51,18 @@ class ShellmanCore:
 
         print(f'Connection {connection_id} from {peername[0]}:{peername[1]}')
 
-        self.connections[connection_id] = (
-            reader, writer, [], self.loop.create_task(self.read_loop(connection_id)), asyncio.Lock()
-        )
+        connection = Connection(reader, writer, connection_id)
+        self.connections.append(connection)
 
         # notify frontends that a new connection is available
         for frontend in self.frontends:
-            await frontend.on_connection(connection_id=connection_id)
-
-    async def write_to_connection(self, connection_id, data, writer):
-        conn = self.connections[connection_id]
-        for frontend in conn[2]:
-            if frontend != writer:
-                await frontend.on_write_by_other(connection_id, data)
-        async with conn[4]:
-            conn[1].write(data)
-
-    async def read_loop(self, connection_id):
-        conn = self.connections[connection_id]
-        while True:
-            data = await conn[0].readline()
-            if data == b'':
-                await self.disconnected(connection_id)
-                break
-            for frontend in conn[2]:
-                await frontend.on_read(connection_id, data)
-
-    async def disconnected(self, connection_id):
-        conn = self.connections[connection_id]
-        for frontend in conn[2]:
-            await frontend.on_disconnect(connection_id)
-
-        del self.connections[connection_id]
+            await frontend.on_connection(connection)
 
     def import_frontends(self):
         frontend_file_list = os.listdir(f'{os.path.dirname(__file__)}/frontends/')
         for file in frontend_file_list:
             if file in ['.', '..']:
                 continue
-
             try:
                 # import module from the module folder
                 module = importlib.import_module(f'..frontends.{file}', __name__)
@@ -99,6 +73,3 @@ class ShellmanCore:
             except Exception as e:
                 print(f"Failed to import frontend at {file}")
                 print(e)
-
-    def add_frontend_to_connection(self, connection_id, frontend):
-        self.connections[connection_id][2].append(frontend)
