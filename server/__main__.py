@@ -13,4 +13,7 @@ except KeyError:
 core = ShellmanCore()
 core.import_frontends()
 
-asyncio.get_event_loop().run_forever()
+loop = asyncio.get_event_loop()
+
+loop.create_task(core.start_listening(Config()['connection']['host'], Config()['connection']['port']))
+loop.run_forever()

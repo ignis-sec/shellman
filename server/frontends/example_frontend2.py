@@ -1,12 +1,12 @@
-from ...shellman import ShellmanCore
+from ..shellman import ShellmanCore
 
 
 class ShellmanFrontend:
     def __init__(self):
-        pass
+        print('example_frontend: hello from example_frontend initialization')
 
     async def on_connection(self, connection):
-        print(f"example_frontend: connection {connection.id} received, listening")
+        print(f'example_frontend: connection {connection.id} received, listening')
         connection.add_frontend(self)
 
     async def on_read(self, connection, data):
