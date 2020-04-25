@@ -15,7 +15,6 @@ class ShellmanCore:
     frontends = []
     connections = []
     ssl_ctx = None
-    loop = None
 
     def __init__(self):
         print("Initializing ShellmanCore")
@@ -32,19 +31,13 @@ class ShellmanCore:
         os.remove('./cert.pem')
         os.remove('./private.key')
 
-        self.loop = asyncio.get_event_loop()
-
-        self.loop.create_task(self.start_listening(Config()['connection']['port']))
-        # loop.create_task(self.read_loop())
-        # start checking connections' readers for updates
-
-    async def start_listening(self, port):
-        server = await asyncio.start_server(self.client_connected, Config()['connection']['host'],
+    async def start_listening(self, host, port):
+        server = await asyncio.start_server(self.client_connected, host,
                                             port, family=socket.AF_INET, ssl=self.ssl_ctx)
         addr = server.sockets[0].getsockname()
         print(f'Serving on {addr[0]}:{addr[1]}')
 
-    async def client_connected(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+    async def client_connected(self, reader, writer):
         peername: (str, int) = writer.get_extra_info('peername')
         connection_id = self.connection_id_ctr
         self.connection_id_ctr += 1
@@ -61,8 +54,10 @@ class ShellmanCore:
     def import_frontends(self):
         frontend_file_list = os.listdir(f'{os.path.dirname(__file__)}/frontends/')
         for file in frontend_file_list:
-            if file in ['.', '..']:
+            if file in ('.', '..', '__pycache__'):
                 continue
+            if file.endswith('.py'):
+                file = file[:-3]
             try:
                 # import module from the module folder
                 module = importlib.import_module(f'..frontends.{file}', __name__)

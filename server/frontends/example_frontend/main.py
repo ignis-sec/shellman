@@ -1,4 +1,4 @@
-from server.shellman import ShellmanCore
+from ...shellman import ShellmanCore
 
 
 class ShellmanFrontend:
