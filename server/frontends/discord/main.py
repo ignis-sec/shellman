@@ -2,9 +2,35 @@ from .config import bot
 import discord
 from server.shellman import ShellmanCore
 import asyncio
+import threading
 
 client = discord.Client()
 guild = None
+
+timer = None
+delayCallId=0
+
+writeBuffer = {}
+def retriggerableDelay(delay, callback, id):
+    global timer
+    if(writeBuffer[id]["timer"]):
+        writeBuffer[id]["timer"].cancel()
+    
+    t = asyncio.get_event_loop().create_task(sendToShellChannel(id,delay))
+    writeBuffer[id]["timer"] = t
+
+
+
+async def sendToShellChannel(id,delay):
+    print("Callback called")
+    asyncio.sleep(delay)
+    print("Delay finished")
+    data = f'```{writeBuffer[id]["buf"]}```'
+    channel = discord.utils.get(guild.channels, name=str(id))
+    await channel.send(data)
+    writeBuffer[id]["buf"]="\n"
+    writeBuffer[id]["timer"] = None
+
 
 
 class ShellmanFrontend:
@@ -13,20 +39,22 @@ class ShellmanFrontend:
     def __init__(self):
         self.TOKEN = bot["token"]
         loop = asyncio.get_event_loop()
+        loop.set_debug(True)
         loop.create_task(client.start(bot["token"]))
-
 
 
     ##CORE HOOKS
     #######################################
-    async def on_connection(self, connection_id):
-        print(f"Discordbot: connection {connection_id} received, listening")
-        await self.createChannel(connection_id)
-        ShellmanCore().add_frontend_to_connection(connection_id, self)
+    async def on_connection(self, connection):
+        print(f"Discordbot: connection {connection} received, listening")
+        await self.createChannel(connection.id)
+        connection.add_frontend(self)
+        writeBuffer[connection.id] = {"timer": None, "buf": "\n"}
 
-    async def on_read(self, conn_id, data):
-        print(f'example_frontend: received data from connection {conn_id}: {data} - sending back the same')
-        await ShellmanCore().write_to_connection(conn_id, data, self)
+    async def on_read(self, connection, data):
+        print(f'discord: received data from connection {connection.id}: {data}')
+        writeBuffer[connection.id]["buf"] = writeBuffer[connection.id]["buf"] + data.decode()
+        retriggerableDelay(0.5, sendToShellChannel, connection.id)
 
     async def on_disconnect(self, conn_id):
         print(f'example_frontend: {conn_id} disconnected :(')
@@ -48,13 +76,13 @@ class ShellmanFrontend:
         print(guild)
         print(f'{client.user} has connected to Discord!')
 
+
+
     @client.event
     async def on_message(message):
         if message.author == client.user:
             return
-        
-        
-        
+         
         if(message.content=='!shinit'):
             global guild
             guild = message.guild
@@ -68,14 +96,10 @@ class ShellmanFrontend:
 
 
         if(message.channel.category.name=='shells'):
-            print(message.channel.name)
-
+            await ShellmanCore().write(int(message.channel.name), (message.content + "\n").encode(), "discord" )
+ 
     async def createChannel(self,name):
-        print(guild)
-        print(guild.categories)
         category = discord.utils.get(guild.categories, name="shells")
-        print(category)
         await guild.create_text_channel(name, category=category)
-        
-        pass
+
 
