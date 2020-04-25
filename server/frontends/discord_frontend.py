@@ -29,15 +29,14 @@ class ShellmanFrontend:
         writeBuffer[connection.id] = {"timer": None, "buf": "\n"}
 
     async def on_read(self, connection, data):
-        print(f'discord: received data from connection {connection.id}: {data}')
         writeBuffer[connection.id]["buf"] = writeBuffer[connection.id]["buf"] + data.decode()
 
         write_task = writeBuffer[connection.id]["timer"]
         if write_task:
             write_task.cancel()
 
-        new_write_task = asyncio.get_event_loop().create_task(send_buffer_to_channel_with_delay(id, 0.5))
-        writeBuffer[id]["timer"] = new_write_task
+        new_write_task = asyncio.get_event_loop().create_task(send_buffer_to_channel_with_delay(connection.id, 0.5))
+        writeBuffer[connection.id]["timer"] = new_write_task
 
     async def on_disconnect(self, conn_id):
         print(f'discord_frontend: {conn_id} disconnected :(')
@@ -76,12 +75,18 @@ async def on_message(message):
 
 
 async def send_buffer_to_channel_with_delay(id, delay):
-    print("Callback called")
     await asyncio.sleep(delay)
-    print("Delay finished")
-    data = f'```{writeBuffer[id]["buf"]}```'
-    channel = discord.utils.get(guild.channels, name=str(id))
-    await channel.send(data)
+
+    channel = discord.utils.get(discord.utils.get(guild.categories, name="shells").channels, name=str(id))
+    data = '```\n'
+    for line in writeBuffer[id]["buf"].splitlines():
+        if len(data) + len(line) <= 1996:
+            data += f'{line}\n'
+        else:
+            await channel.send(f'{data}```')
+            data = f'```\n{line}\n'
+    if data:
+        await channel.send(f'{data}```')
     writeBuffer[id]["buf"] = "\n"
     writeBuffer[id]["timer"] = None
 

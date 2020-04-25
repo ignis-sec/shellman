@@ -31,6 +31,7 @@ class Connection:
                 await self.disconnected()
                 break
             for frontend in self.listening_frontends:
+                # TODO: maybe not make this blocking?
                 await frontend.on_read(self, data)
 
     async def disconnected(self):
