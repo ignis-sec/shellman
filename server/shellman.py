@@ -68,6 +68,14 @@ class ShellmanCore:
             except Exception as e:
                 print(f"Failed to import frontend at {file}")
                 print(e)
+                raise e
 
     async def write(self, connection_id, data, writer):
         await self.connections[connection_id].write(data, writer)
+
+    async def shutdown(self):
+        for connection in self.connections:
+            connection.writer.close()
+            await connection.writer.wait_closed()
+        for frontend in self.frontends:
+            await frontend.shutdown()

@@ -16,4 +16,10 @@ core.import_frontends()
 loop = asyncio.get_event_loop()
 
 loop.create_task(core.start_listening(Config()['connection']['host'], Config()['connection']['port']))
-loop.run_forever()
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    loop.run_until_complete(ShellmanCore().shutdown())
+finally:
+    print('Shutting down')
+    loop.close()
