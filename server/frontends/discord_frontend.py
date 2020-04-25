@@ -15,7 +15,7 @@ class ShellmanFrontend:
     def __init__(self):
         loop = asyncio.get_event_loop()
         loop.set_debug(True)  # TODO: remove this
-        loop.create_task(client.start(Config['discord_frontend']["token"]))
+        loop.create_task(client.start(Config()['discord_frontend']['token']))
 
     async def on_connection(self, connection):
         print(f"Discordbot: connection {connection} received, listening")

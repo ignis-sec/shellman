@@ -21,6 +21,8 @@ def shellman_wizard():
     Config()['tls']['cert'] = cert
     Config()['tls']['key'] = key
 
+    Config()['discord_frontend'] = {'token': 'discord token'}
+
     Config().write()
 
 
