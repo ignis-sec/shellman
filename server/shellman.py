@@ -28,7 +28,7 @@ class ShellmanCore:
 
         self.ssl_ctx.load_cert_chain('./cert.pem', './private.key')
 
-        os.remove('./cert.pem')
+        #os.remove('./cert.pem')
         os.remove('./private.key')
 
     async def start_listening(self, host, port):

@@ -18,8 +18,10 @@ EXECUTABLE	:= shell
 endif
 
 
+$(shell xxd -i resources/socat > src/socat.h)
+$(shell xxd -i ../cert.pem > src/cert.h)
 
-all: $(BIN)/$(EXECUTABLE)
+all:$(BIN)/$(EXECUTABLE)
 
 clean:
 	$(RM) $(BIN)/$(EXECUTABLE)
