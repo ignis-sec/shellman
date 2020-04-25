@@ -32,7 +32,7 @@ class ShellmanFrontend:
             write_task.cancel()
 
         new_write_task = asyncio.get_event_loop().create_task(send_buffer_to_channel_with_delay(id, 0.5))
-        writeBuffer[id]["timer"] = write_task
+        writeBuffer[id]["timer"] = new_write_task
 
     async def on_disconnect(self, conn_id):
         print(f'discord_frontend: {conn_id} disconnected :(')
