@@ -54,7 +54,7 @@ class ShellmanCore:
     def import_frontends(self):
         frontend_file_list = os.listdir(f'{os.path.dirname(__file__)}/frontends/')
         for file in frontend_file_list:
-            if file in ('.', '..', '__pycache__'):
+            if file.startswith('.') or file == '__pycache__':
                 continue
             if file.endswith('.py'):
                 file = file[:-3]
