@@ -10,8 +10,9 @@ class ShellmanFrontend:
         connection.add_frontend(self)
 
     async def on_read(self, connection, data):
-        print(f'example_frontend: received data from connection {connection.id}: {data} - sending back the same')
+        print(f'example_frontend: received data from connection {connection.id}: {data} - sending back the same twice')
         await connection.write(data, self)
+        await ShellmanCore().write(connection.id, data, self)
 
     async def on_disconnect(self, connection):
         print(f'example_frontend: {connection.id} disconnected :(')

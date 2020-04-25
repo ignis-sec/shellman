@@ -22,6 +22,7 @@ class Connection:
                 await frontend.on_write_by_other(self, data)
         async with self.write_lock:
             self.writer.write(data)
+            await self.writer.drain()
 
     async def read_loop(self):
         while True:
@@ -37,4 +38,4 @@ class Connection:
             await frontend.on_disconnect(self)
 
         from .shellman import ShellmanCore
-        ShellmanCore().connections.remove(self)
+        ShellmanCore().connections[self.id] = None
