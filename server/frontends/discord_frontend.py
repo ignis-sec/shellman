@@ -71,7 +71,20 @@ async def on_message(message):
         await message.guild.create_category('shells')
 
     if message.channel.category.name == 'shells':
-        await ShellmanCore().write(int(message.channel.name), (message.content + "\n").encode(), "discord")
+        if message.content =='!flush':
+            writeBuffer[int(message.channel.name)]["buf"] = "\n"
+            writeBuffer[int(message.channel.name)]["timer"].cancel()
+            writeBuffer[int(message.channel.name)]["timer"] = None
+            await message.channel.send('Flushed buffer')
+
+        elif(message.content == "!C"):
+            await ShellmanCore().write(int(message.channel.name), b"\x03\n", "discord")
+        elif(message.content == "!clear"):
+            name = message.channel.name
+            await message.channel.delete()
+            await create_channel(name)
+        else:
+            await ShellmanCore().write(int(message.channel.name), (message.content + "\n").encode(), "discord")
 
 
 async def send_buffer_to_channel_with_delay(id, delay):
