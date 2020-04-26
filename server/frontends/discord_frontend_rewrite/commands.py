@@ -1,10 +1,13 @@
 import re
 
-from .handlers import send_to_shell, send_ctrl_c, flush, clear, reset_category
+from .handlers import send_to_shell, send_ctrl_c, flush, clear, reset_category, listen_shell, listen_port, list_shells
 
 # Set what handles which regexes
 main_channel_commands = {
-    r'^!catreset$': reset_category.handler
+    r'^!catreset$': reset_category.handler,
+    r'^!listen( (\d+) <#(\d+)>)?$': listen_shell.handler,
+    r'^!portlisten$': listen_port.handler,
+    r'^!shells$': list_shells.handler
 }
 
 # TODO: implement main channel commands (listen shell, listen port?, list shells)
@@ -36,8 +39,9 @@ async def handle_main_channel_command(message, discord_client):
     :param discord_client: The discord.py Client
     """
     for regex_, handler in main_channel_commands.items():
-        if regex_.match(message.content):
-            await handler(message, discord_client)
+        match = regex_.match(message.content)
+        if match:
+            await handler(message, match, discord_client)
             break
 
 
@@ -53,6 +57,7 @@ async def handle_shell_command(message, shell, shellman_frontend):
                               notify the other frontends about what we're doing.
     """
     for regex_, handler in shell_commands.items():
-        if regex_.match(message.content):
-            await handler(message, shell, shellman_frontend)
+        match = regex_.match(message.content)
+        if match:
+            await handler(message, match, shell, shellman_frontend)
             break

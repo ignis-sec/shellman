@@ -22,7 +22,10 @@ class Connection:
                 await frontend.on_write_by_other(self, data)
         async with self.write_lock:
             self.writer.write(data)
-            await self.writer.drain()
+            try:
+                await self.writer.drain()
+            except ConnectionResetError:
+                await self.disconnected()
 
     async def read_loop(self):
         while True:
