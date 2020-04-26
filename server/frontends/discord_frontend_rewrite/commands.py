@@ -38,6 +38,8 @@ async def handle_shell_command(message, shell, shellman_frontend):
 
     :param message: The discord.py Message object to check
     :param shell: The Shell object the message is for
+    :param shellman_frontend: The instance of ShellmanFrontend we come from - this is for letting ShellmanCore
+                              notify the other frontends about what we're doing.
     """
     for regex_, handler in shell_commands.items():
         if regex_.match(message.content):
