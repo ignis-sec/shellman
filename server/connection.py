@@ -30,9 +30,8 @@ class Connection:
             if data == b'':
                 await self.disconnected()
                 break
-            for frontend in self.listening_frontends:
-                # TODO: maybe not make this blocking?
-                await frontend.on_read(self, data)
+            on_reads = [frontend.on_read(self, data) for frontend in self.listening_frontends]
+            await asyncio.wait(on_reads, return_when=asyncio.ALL_COMPLETED)
 
     async def disconnected(self):
         for frontend in self.listening_frontends:

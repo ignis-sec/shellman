@@ -8,6 +8,7 @@ from .discord_client import DiscordClient
 class ShellmanFrontend:
     discord_client = None
     shells = {}
+    guild = None
 
     def __init__(self):
         loop = asyncio.get_event_loop()
@@ -22,14 +23,17 @@ class ShellmanFrontend:
 
     async def on_connection(self, connection):
         print(f"discord_frontend: connection {connection.id} received")
-        if Config()['discord_frontend']['admin_mode']:
-            channel = None  # TODO: create channel, set this to Channel object - naming may have options
+        if Config()['discord_frontend'].getboolean('admin_mode'):
             connection.add_frontend(self)
-            self.shells[connection.id] = Shell(connection=connection, channel=channel)
+            self.shells[connection.id] = Shell(connection=connection)
+            await self.create_shell_channel(self.shells[connection.id])
         else:
-            # TODO: let user know about new connection in configured channel
-            # TODO: do admin mode steps 2 and 3 if user runs ?listen <id> <channel>
-            pass
+            await self.discord_client.main_channel.send(f'New connection {connection.id} available!')
+
+    async def create_shell_channel(self, shell):
+        # TODO: create or find category
+        # TODO: naming may have options
+        shell.channel = await self.discord_client.guild.create_text_channel(name=str(shell.connection.id))
 
     async def on_read(self, connection, data):
         shell = self.shells[connection.id]

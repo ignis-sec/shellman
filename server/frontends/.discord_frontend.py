@@ -14,11 +14,9 @@ writeBuffer = {}
 class ShellmanFrontend:
     def __init__(self):
         loop = asyncio.get_event_loop()
-        loop.set_debug(True)  # TODO: remove this
         try:
             Config()['discord_frontend']
         except KeyError:
-            # TODO: replace this with a wizard?
             print('discord_frontend cannot run without the discord token set in the config')
         loop.create_task(client.start(Config()['discord_frontend']['token']))
 
