@@ -21,9 +21,22 @@ def shellman_wizard():
     Config()['tls']['cert'] = cert
     Config()['tls']['key'] = key
 
-    Config()['discord_frontend'] = {'token': 'discord token'}
+    discord()
 
     Config().write()
+
+
+def discord():
+    Config()['discord_frontend'] = {
+        'token': '',
+        'admin_mode': True,
+        'guild': 702911703301619742,
+        'channel': 702911703301619746,
+        'category': 'shells',
+        'channel_scheme': 'shellman-'
+                          '{shell.connection.writer.get_extra_info("peername")[0].replace(".", "-")}-'
+                          '{shell.connection.id}'
+    }
 
 
 def cert_gen():

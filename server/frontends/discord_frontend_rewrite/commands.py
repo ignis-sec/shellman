@@ -1,9 +1,11 @@
 import re
 
-from .handlers import send_to_shell, send_ctrl_c, flush, clear
+from .handlers import send_to_shell, send_ctrl_c, flush, clear, reset_category
 
 # Set what handles which regexes
-main_channel_commands = {}
+main_channel_commands = {
+    r'^!catreset$': reset_category.handler
+}
 
 # TODO: implement main channel commands (listen shell, listen port?, list shells)
 # TODO: do admin mode steps 2 and 3 if user runs ?listen <id> <channel>
@@ -24,17 +26,18 @@ for regex in shell_commands.copy():
     shell_commands[re.compile(regex)] = shell_commands.pop(regex)
 
 
-async def handle_main_channel_command(message):
+async def handle_main_channel_command(message, discord_client):
     """
     Tries to match message to regexes in keys of the dict `main_channel_commands`.
     For the first key that matches, the coroutine in the value will be passed message and awaited.
     If nothing matches, nothing will happen.
 
     :param message: The discord.py Message object to check
+    :param discord_client: The discord.py Client
     """
     for regex_, handler in main_channel_commands.items():
         if regex_.match(message.content):
-            await handler(message)
+            await handler(message, discord_client)
             break
 
 

@@ -17,7 +17,7 @@ class ShellmanFrontend:
             Config()['discord_frontend']
         except KeyError:
             # TODO: replace this with a wizard?
-            print('discord_frontend cannot run without the discord token set in the config')
+            print('discord_frontend cannot run without config')
         self.discord_client = DiscordClient(shellman_frontend=self)
         loop.create_task(self.discord_client.start(Config()['discord_frontend']['token']))
 
@@ -31,9 +31,12 @@ class ShellmanFrontend:
             await self.discord_client.main_channel.send(f'New connection {connection.id} available!')
 
     async def create_shell_channel(self, shell):
-        # TODO: create or find category
-        # TODO: naming may have options
-        shell.channel = await self.discord_client.guild.create_text_channel(name=str(shell.connection.id))
+        name = eval(
+            "f'{}'".format(Config()['discord_frontend']['channel_scheme']),
+            {'shell': shell}
+        )
+        shell.channel = await self.discord_client.guild.create_text_channel(name=name,
+                                                                            category=self.discord_client.category)
 
     async def on_read(self, connection, data):
         shell = self.shells[connection.id]
