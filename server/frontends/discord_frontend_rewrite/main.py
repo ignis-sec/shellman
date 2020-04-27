@@ -12,7 +12,6 @@ class ShellmanFrontend:
 
     def __init__(self):
         loop = asyncio.get_event_loop()
-        loop.set_debug(True)  # TODO: remove this
         try:
             Config()['discord_frontend']
         except KeyError:
@@ -75,7 +74,6 @@ class ShellmanFrontend:
     async def on_disconnect(self, connection):
         await self.shells[connection.id].channel.send('Disconnected :(')
         del self.shells[connection.id]
-        # TODO: if admin mode, lock the chat or otherwise indicate it's disconnected
 
     async def on_write_by_other(self, connection, data):
         shell = self.shells[connection.id]
