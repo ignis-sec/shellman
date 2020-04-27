@@ -3,21 +3,60 @@ from OpenSSL import crypto
 from .config import Config
 
 
+
+
+
+conf = {
+    'connection':{
+        'host': {
+            'default':'0.0.0.0',
+            'desc': 'host interface to listen on for incoming tls connections'
+        },
+        'port':{
+            'default':8080,
+            'desc': 'port to listen on for incoming tls connections'
+        },
+    },
+    'tls':{
+        'CN': {
+            'default':'localhost',
+            'desc': "hostname to be used for certificate CN. If it doesn't match the connection hostname, certificate verification will fail."
+        }
+    }
+}
+
+
+
+def prompt_configs():
+    print('Fill out configs: (empty for default, ? for info)')
+    for key, elem in conf.items():
+        if('default' not in elem):
+            Config()[key] = {}
+            for subkey in elem:
+                flag=True
+                while(flag):
+                    flag=False
+                    v = input(f"[{key}][{subkey}] ({conf[key][subkey]['default']}): ")
+                    if(v=='?'):
+                        flag=True
+                        print(conf[key][subkey]['desc'])
+
+                Config()[key][subkey] = v or conf[key][subkey]['default']
+        else:
+            flag=True
+            while(flag):
+                flag=False
+                v = input(f"[{key}] ({conf[key]['default']}): ")
+                if(v=='?'):
+                    flag=True
+                    print(conf[key]['desc'])
+            Config()[key] = v or conf[key]['default']
+
+
+
 def shellman_wizard():
-    Config()['connection'] = {
-        'host': '0.0.0.0',
-        'port': 8080
-    }
-    Config()['shellman'] = {
-        'allow_frontend_to_listen': True
-    }
-
-    Config()['tls'] = {}
-    Config()['tls']['CN'] = 'localhost'
-
-    print('Generating TLS certificate...')
+    prompt_configs()
     cert, key = cert_gen()
-    print('Done!')
     Config()['tls']['cert'] = cert
     Config()['tls']['key'] = key
 
