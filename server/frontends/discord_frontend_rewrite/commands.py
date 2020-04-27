@@ -7,18 +7,16 @@ main_channel_commands = {
     r'^!catreset$': reset_category.handler,
     r'^!listen( (\d+) <#(\d+)>)?$': listen_shell.handler,
     r'^!portlisten$': listen_port.handler,
-    r'^!shells$': list_shells.handler
+    r'^!shells$': list_shells.handler,
+    # TODO: stop listening port/shell
 }
-
-# TODO: implement main channel commands (listen shell, listen port?, list shells)
-# TODO: do admin mode steps 2 and 3 if user runs ?listen <id> <channel>
-
 
 shell_commands = {
     r'^(!|\^)C$': send_ctrl_c.handler,
     r'^!flush$': flush.handler,
     r'^!clear$': clear.handler,
-    r'^.*$': send_to_shell.handler
+    r'^.*$': send_to_shell.handler,
+    # TODO: change channel name
 }
 
 # Compile the regexes so they run faster (we'll be running them for every command!)
