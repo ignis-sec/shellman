@@ -43,25 +43,8 @@ $callback = [System.Net.Security.RemoteCertificateValidationCallback]{
         [System.Net.Security.SslPolicyErrors] $sslPolicyErrors
     )
 
-    if ($sslPolicyErrors -eq [System.Net.Security.SslPolicyErrors]::None){
-        return $true
-    }
-
-    if ($sslPolicyErrors -ne [System.Net.Security.SslPolicyErrors]::RemoteCertificateChainErrors){
-        return $false
-    }
-
-    $cchain = New-Object System.Security.Cryptography.X509Certificates.X509Chain
     $cacert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2(,$global:cert)
-    $givencert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($certificate)
-    $null = $cchain.ChainPolicy.ExtraStore.Add($cacert)
-    $cchain.ChainPolicy.VerificationFlags = [System.Security.Cryptography.X509Certificates.X509VerificationFlags]::AllowUnknownCertificateAuthority;
-
-    if (-Not $cchain.Build($givencert)){
-        return $false
-    }
-
-    return ($cchain.ChainElements[$cchain.ChainElements.Count - 1].Certificate.Thumbprint -eq $cacert.thumbprint);
+    return ((Compare-Object $cacert.RawData $certificate.RawData) -eq $null)
 }
 
 $socket = New-Object Net.Sockets.TcpClient($global:conn_host, $global:port)
