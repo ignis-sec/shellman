@@ -44,6 +44,7 @@ class ShellmanCore:
         return True
 
     async def stop_listening(self, host, port):
+        success = False
         for server in self.servers.copy():
             if success := server.sockets[0].getsockname() == (host, int(port)):
                 server.close()

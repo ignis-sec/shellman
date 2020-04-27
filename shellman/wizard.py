@@ -1,3 +1,5 @@
+import os
+
 from OpenSSL import crypto
 
 from .config import Config
@@ -16,8 +18,7 @@ config_dict = {
     'tls': {
         'CN': {
             'default': 'localhost',
-            'desc': "hostname to be used for certificate CN. If it doesn't match the connection hostname, "
-                    "certificate verification will fail."
+            'desc': 'hostname to be used for certificate CN, this should be where the target can reach you'
         }
     }
 }
@@ -56,6 +57,20 @@ def shellman_wizard():
     Config()['tls']['key'] = key
     Config().write()
     # here, create payloads from templates
+    path = f'{os.path.dirname(__file__)}/payloads/'
+    payload_file_list = os.listdir(path)
+    for file in payload_file_list:
+        if file.startswith('.'):
+            continue
+        with open(path+file, 'rb') as payload:
+            pld = payload.read()
+
+        pld = pld.replace(b'HOSTHERE', Config()['tls']['CN'].encode('utf-8'))\
+                 .replace(b'PORTHERE', Config()['shellman']['port'].encode('utf-8'))\
+                 .replace(b'CERTHERE', Config()['tls']['cert'].encode('utf-8'))
+
+        with open('./'+file, 'wb') as payload:
+            payload.write(pld)
 
 
 def cert_gen():
