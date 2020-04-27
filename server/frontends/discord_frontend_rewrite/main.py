@@ -74,6 +74,7 @@ class ShellmanFrontend:
 
     async def on_disconnect(self, connection):
         await self.shells[connection.id].channel.send('Disconnected :(')
+        del self.shells[connection.id]
         # TODO: if admin mode, lock the chat or otherwise indicate it's disconnected
 
     async def on_write_by_other(self, connection, data):
