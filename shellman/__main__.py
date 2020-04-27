@@ -15,7 +15,7 @@ core.import_frontends()
 
 loop = asyncio.get_event_loop()
 
-loop.create_task(core.start_listening(Config()['connection']['host'], Config()['connection']['port']))
+loop.create_task(core.start_listening(Config()['shellman']['host'], Config()['shellman']['port']))
 try:
     loop.run_forever()
 except KeyboardInterrupt:

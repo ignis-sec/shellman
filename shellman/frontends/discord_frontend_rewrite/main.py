@@ -3,6 +3,7 @@ import asyncio
 from ...config import Config
 from .shell import Shell
 from .discord_client import DiscordClient
+from ...wizard import prompt_configs
 
 
 class ShellmanFrontend:
@@ -15,8 +16,10 @@ class ShellmanFrontend:
         try:
             Config()['discord_frontend']
         except KeyError:
-            # TODO: replace this with a wizard?
-            print('discord_frontend cannot run without config')
+            from .config import config_dict
+            prompt_configs(config_dict)
+            Config().write()
+
         self.discord_client = DiscordClient(shellman_frontend=self)
         loop.create_task(self.discord_client.start(Config()['discord_frontend']['token']))
 
