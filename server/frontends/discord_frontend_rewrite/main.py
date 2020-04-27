@@ -24,17 +24,21 @@ class ShellmanFrontend:
         print(f"discord_frontend: connection {connection.id} received")
         if Config()['discord_frontend'].getboolean('admin_mode'):
             connection.add_frontend(self)
-            self.shells[connection.id] = Shell(connection=connection)
-            await self.create_shell_channel(self.shells[connection.id])
+            self.shells[connection.id] = shell = Shell(connection=connection)
+            shell.name = self.get_default_channel_name(shell)
+            await self.create_shell_channel(shell)
         else:
             await self.discord_client.main_channel.send(f'New connection {connection.id} available!')
 
-    async def create_shell_channel(self, shell):
-        name = eval(
+    def get_default_channel_name(self, shell):
+        return eval(
             "f'{}'".format(Config()['discord_frontend']['channel_scheme']),
             {'shell': shell}
         )
-        shell.channel = await self.discord_client.guild.create_text_channel(name=name,
+
+
+    async def create_shell_channel(self, shell):
+        shell.channel = await self.discord_client.guild.create_text_channel(name=shell.name,
                                                                             category=self.discord_client.category)
 
     async def on_read(self, connection, data):

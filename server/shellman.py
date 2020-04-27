@@ -14,6 +14,7 @@ class ShellmanCore:
     connection_id_ctr = 0
     frontends = []
     connections = []
+    servers = []
     ssl_ctx = None
 
     def __init__(self):
@@ -28,14 +29,28 @@ class ShellmanCore:
 
         self.ssl_ctx.load_cert_chain('./cert.pem', './private.key')
 
-        # os.remove('./cert.pem')
+        os.remove('./cert.pem')
         os.remove('./private.key')
 
     async def start_listening(self, host, port):
-        server = await asyncio.start_server(self.client_connected, host,
-                                            port, family=socket.AF_INET, ssl=self.ssl_ctx)
-        addr = server.sockets[0].getsockname()
-        print(f'Serving on {addr[0]}:{addr[1]}')
+        try:
+            server = await asyncio.start_server(self.client_connected, host,
+                                                port, family=socket.AF_INET, ssl=self.ssl_ctx)
+        except (OSError, socket.gaierror) as e:
+            print(e)
+            return False
+
+        self.servers.append(server)
+        return True
+
+    async def stop_listening(self, host, port):
+        for server in self.servers.copy():
+            if success := server.sockets[0].getsockname() == (host, int(port)):
+                server.close()
+                await server.wait_closed()
+                self.servers.remove(server)
+                break
+        return success
 
     async def client_connected(self, reader, writer):
         peername: (str, int) = writer.get_extra_info('peername')
@@ -68,7 +83,6 @@ class ShellmanCore:
             except Exception as e:
                 print(f"Failed to import frontend at {file}")
                 print(e)
-                raise e
 
     async def write(self, connection_id, data, writer):
         await self.connections[connection_id].write(data, writer)
