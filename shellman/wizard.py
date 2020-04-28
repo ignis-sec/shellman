@@ -24,6 +24,16 @@ config_dict = {
 }
 
 
+def check_config(conf):
+    for key, subkeys in conf.items():
+        for subkey in subkeys:
+            try:
+                Config()[key][subkey]
+            except KeyError:
+                return False
+    return True
+
+
 def prompt_configs(conf):
     print('Fill out configs: (empty for default, ? for info)')
     for key, subkeys in conf.items():

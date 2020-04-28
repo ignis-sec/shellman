@@ -1,13 +1,11 @@
 import asyncio
 
 from .shellman import ShellmanCore
-from .wizard import shellman_wizard
+from .wizard import shellman_wizard, check_config, config_dict
 from .config import Config
 
-# check if config exists
-try:
-    Config()['shellman']
-except KeyError:
+# check if config has all required keys
+if not check_config(config_dict):
     shellman_wizard()
 
 core = ShellmanCore()

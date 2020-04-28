@@ -3,8 +3,9 @@ import asyncio
 from ...config import Config
 from .shell import Shell
 from .discord_client import DiscordClient
-from ...wizard import prompt_configs
+from ...wizard import prompt_configs, check_config
 from ...frontend import ShellmanFrontend
+from .config import config_dict
 
 
 class DiscordFrontend(ShellmanFrontend):
@@ -13,16 +14,12 @@ class DiscordFrontend(ShellmanFrontend):
     guild = None
 
     def __init__(self):
-        loop = asyncio.get_event_loop()
-        try:
-            Config()['discord_frontend']
-        except KeyError:
-            from .config import config_dict
+        if not check_config(config_dict):
             prompt_configs(config_dict)
             Config().write()
 
         self.discord_client = DiscordClient(shellman_frontend=self)
-        loop.create_task(self.discord_client.start(Config()['discord_frontend']['token']))
+        asyncio.get_event_loop().create_task(self.discord_client.start(Config()['discord_frontend']['token']))
 
     async def on_connection(self, connection):
         print(f"discord_frontend: connection {connection.id} received")
