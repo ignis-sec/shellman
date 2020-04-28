@@ -1,1 +1,1 @@
-from .main import ShellmanFrontend
+from .main import DiscordFrontend as ShellmanFrontend

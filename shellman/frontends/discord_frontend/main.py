@@ -4,9 +4,10 @@ from ...config import Config
 from .shell import Shell
 from .discord_client import DiscordClient
 from ...wizard import prompt_configs
+from ...frontend import ShellmanFrontend
 
 
-class ShellmanFrontend:
+class DiscordFrontend(ShellmanFrontend):
     discord_client = None
     shells = {}
     guild = None
@@ -33,17 +34,6 @@ class ShellmanFrontend:
         else:
             await self.discord_client.main_channel.send(f'New connection {connection.id} available!')
 
-    def get_default_channel_name(self, shell):
-        return eval(
-            "f'{}'".format(Config()['discord_frontend']['channel_scheme']),
-            {'shell': shell}
-        )
-
-
-    async def create_shell_channel(self, shell):
-        shell.channel = await self.discord_client.guild.create_text_channel(name=shell.name,
-                                                                            category=self.discord_client.category)
-
     async def on_read(self, connection, data):
         shell = self.shells[connection.id]
 
@@ -58,6 +48,18 @@ class ShellmanFrontend:
         )
 
         shell.write_task = new_write_task
+
+    async def on_disconnect(self, connection):
+        await self.shells[connection.id].channel.send('Disconnected :(')
+        del self.shells[connection.id]
+
+    async def on_write_by_other(self, connection, data):
+        shell = self.shells[connection.id]
+        async with shell.buffer_lock:
+            shell.buffer += f'o> {data}\n'
+
+    async def shutdown(self):
+        await self.discord_client.logout()
 
     async def send_buffer_to_channel_with_delay(self, connection, delay):
         await asyncio.sleep(delay)
@@ -78,14 +80,13 @@ class ShellmanFrontend:
         shell.buffer = ''
         shell.write_task = None
 
-    async def on_disconnect(self, connection):
-        await self.shells[connection.id].channel.send('Disconnected :(')
-        del self.shells[connection.id]
+    async def create_shell_channel(self, shell):
+        shell.channel = await self.discord_client.guild.create_text_channel(name=shell.name,
+                                                                            category=self.discord_client.category)
 
-    async def on_write_by_other(self, connection, data):
-        shell = self.shells[connection.id]
-        async with shell.buffer_lock:
-            shell.buffer += f'o> {data}\n'
-
-    async def shutdown(self):
-        await self.discord_client.logout()
+    @staticmethod
+    def get_default_channel_name(shell):
+        return eval(
+            "f'{}'".format(Config()['discord_frontend']['channel_scheme']),
+            {'shell': shell}
+        )

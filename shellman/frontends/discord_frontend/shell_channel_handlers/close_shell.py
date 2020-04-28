@@ -1,4 +1,4 @@
-from ....shellman import ShellmanCore
+from shellman.shellman import ShellmanCore
 
 
 async def handle(message, match, shell, shellman_frontend):

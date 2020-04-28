@@ -1,4 +1,4 @@
-from ....config import Config
+from shellman.config import Config
 
 
 async def handle(message, match, shell, shellman_frontend):
