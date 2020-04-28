@@ -1,4 +1,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.ini
+
+# VS cache/options directory
+.vs/*
+.vscode/*
+# generated config file
+config.ini
+
+# our generated payloads containing host and cert data
+openssl_sclient_payload.sh
+windows_ps_payload.ps1
