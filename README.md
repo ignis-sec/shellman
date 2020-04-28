@@ -7,7 +7,7 @@ Please check out [the frontends' READMEs][discord_frontend] for information spec
 ## Demo
 Here's what the Discord frontend looks like in action:
 <p align="center">
-  <img src="frontends/discord_frontend/demo.gif">
+  <img src="shellman/frontends/discord_frontend/demo.gif">
 </p>
 
 
