@@ -26,28 +26,16 @@ config_dict = {
 
 def prompt_configs(conf):
     print('Fill out configs: (empty for default, ? for info)')
-    for key, elem in conf.items():
-        if 'default' not in elem:
-            Config()[key] = {}
-            for subkey in elem:
-                flag = True
-                while flag:
-                    flag = False
-                    v = input(f"[{key}][{subkey}] ({conf[key][subkey]['default']}): ")
-                    if v == '?':
-                        flag = True
-                        print(conf[key][subkey]['desc'])
+    for key, subkeys in conf.items():
+        Config()[key] = {}
+        for subkey in subkeys:
+            ask_again = True
+            while ask_again:
+                v = input(f"[{key}][{subkey}] ({conf[key][subkey]['default']}): ")
+                if ask_again := v == '?':
+                    print(conf[key][subkey]['desc'])
 
-                Config()[key][subkey] = v or str(conf[key][subkey]['default'])
-        else:
-            flag = True
-            while flag:
-                flag = False
-                v = input(f"[{key}] ({conf[key]['default']}): ")
-                if v == '?':
-                    flag = True
-                    print(conf[key]['desc'])
-            Config()[key] = v or str(conf[key]['default'])
+            Config()[key][subkey] = v or str(conf[key][subkey]['default'])
 
 
 def shellman_wizard():
