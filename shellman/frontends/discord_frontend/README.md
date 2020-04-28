@@ -2,6 +2,10 @@
 `discord_frontend` is a frontend module for `shellman`. The idea is that it lets you (and your team) control your `shellman` reverse shells over Discord. Also, we like using Discord as 
 [@excusemewtf_ctf][excusemewtf].
 
+<p align="center">
+  <img src="demo.gif">
+</p>
+
 ## Usage
 ```
 $ pip install -r requirements.txt
