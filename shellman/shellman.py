@@ -53,6 +53,9 @@ class ShellmanCore:
                 break
         return success
 
+    async def connect_to_bind_shell(self, host, port, ssl=True):
+        await self.client_connected(*(await asyncio.open_connection(host, port, ssl=ssl)))
+
     async def client_connected(self, reader, writer):
         peername: (str, int) = writer.get_extra_info('peername')
         connection_id = self.connection_id_ctr

@@ -1,7 +1,7 @@
 import re
 
 from .main_channel_handlers import reset_category, listen_shell, listen_server, list_shells, list_servers,\
-                                   close_server, main_channel_help
+                                   close_server, main_channel_help, connect_to_shell
 from .shell_channel_handlers import clear, flush, close_shell, rename_channel, send_ctrl_c, send_to_shell, \
                                     shell_channel_help
 
@@ -13,6 +13,7 @@ main_channel_commands = {
     r'^!serverlisten( (\S+) (\d{1,5}))?$': listen_server,
     r'^!serverclose( (\S+) (\d{1,5}))?$': close_server,
     r'^!servers$': list_servers,
+    r'^!connect( (\S+) (\d{1,5}))?( \S+)?$': connect_to_shell,
     r'^!help$': main_channel_help
 }
 
