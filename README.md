@@ -4,6 +4,12 @@ that a team can use together from modular frontends (like Discord) during a CTF.
 
 Please check out [the frontends' READMEs][discord_frontend] for information specific to them.
 
+## Demo
+Here's what the Discord frontend looks like in action:
+<p align="center">
+  <img src="frontends/discord_frontend/demo.gif">
+</p>
+
 
 ## Usage
 `shellman` only supports Python 3.8+
