@@ -3,7 +3,7 @@ import re
 from .main_channel_handlers import reset_category, listen_shell, listen_server, list_shells, list_servers,\
                                    close_server, main_channel_help, connect_to_shell
 from .shell_channel_handlers import clear, flush, close_shell, rename_channel, send_ctrl_c, send_to_shell, \
-                                    shell_channel_help
+                                    shell_channel_help, disconnect
 
 # Set what handles which regexes
 main_channel_commands = {
@@ -24,6 +24,7 @@ shell_channel_commands = {
     r'^!close$': close_shell,
     r'^!rename( (\S+))?$': rename_channel,
     r'^!help$': shell_channel_help,
+    r'^!disconnect$': disconnect,
     r'^.*$': send_to_shell
 }
 
