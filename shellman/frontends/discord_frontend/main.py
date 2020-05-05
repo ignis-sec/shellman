@@ -22,7 +22,6 @@ class DiscordFrontend(ShellmanFrontend):
         asyncio.get_event_loop().create_task(self.discord_client.start(Config()['discord_frontend']['token']))
 
     async def on_connection(self, connection):
-        print(f"discord_frontend: connection {connection.id} received")
         if Config()['discord_frontend'].getboolean('admin_mode'):
             connection.add_frontend(self)
             self.shells[connection.id] = shell = Shell(connection=connection)
